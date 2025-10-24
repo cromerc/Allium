@@ -86,9 +86,8 @@ $(DIST_DIR)/.allium/bin/dufs:
 	cp "third-party/dufs/target/$(CROSS_TARGET_TRIPLE)/release/dufs" "$(DIST_DIR)/.allium/bin/"
 
 $(DIST_DIR)/.allium/bin/syncthing:
-	cd "$$(mktemp --directory)"
+	cd "$(mktemp --directory)"
 	wget "https://github.com/syncthing/syncthing/releases/download/v2.0.10/syncthing-linux-arm-v2.0.10.tar.gz" -O syncthing.tar.gz
-	tar xf syncthing.tar.gz
 	mv "syncthing-linux-arm-v2.0.10/syncthing" "$(DIST_DIR)/.allium/bin/syncthing"
 
 DRASTIC_URL := https://github.com/steward-fu/nds/releases/download/v1.8/drastic-v1.8_miyoo.zip
