@@ -48,7 +48,6 @@ where
     tabs: Row<Label<String>>,
     search_results: Option<SearchResultsView>,
     search_view: SearchView,
-    tab_before_search: Option<usize>,
     dirty: bool,
     _phantom_battery: PhantomData<B>,
 }
@@ -141,7 +140,6 @@ where
             tabs,
             search_results: None,
             search_view: SearchView::new(res),
-            tab_before_search: None,
             // title,
             dirty: true,
             _phantom_battery: PhantomData,
@@ -255,7 +253,6 @@ where
     }
 
     pub fn start_search(&mut self) {
-        self.tab_before_search = Some(self.selected);
         self.search_view.activate();
     }
 
@@ -268,7 +265,6 @@ where
     pub fn close_search_results(&mut self) {
         self.search_results = None;
         self.search_view.deactivate();
-        self.tab_before_search = None;
         self.set_should_draw();
     }
 
