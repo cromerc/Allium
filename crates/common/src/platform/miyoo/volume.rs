@@ -1,5 +1,7 @@
 use anyhow::Result;
 use log::debug;
+use std::fs::File;
+use std::io::Write;
 use std::process::Command;
 
 const MIN_VOLUME: i32 = 0;
@@ -23,5 +25,10 @@ pub fn set_volume(volume: i32) -> Result<()> {
     let volume_raw = (volume as f32 + 1.0).log10() / 21f32.log10() * 60.0 - 60.0;
     debug!("set volume: {}", volume_raw as i32);
     set_volume_raw(volume_raw as i32)?;
+    save_volume_raw(volume_raw as i32)?;
     Ok(())
+}
+
+pub fn save_volume_raw(volume_raw: i32) -> Result<()> {
+    Ok(File::create("/tmp/volume")?.write_all(volume_raw.to_string().as_bytes())?)
 }

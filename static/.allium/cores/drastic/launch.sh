@@ -14,9 +14,12 @@ set_snd_level() {
         fi
     done
 
+    vol=$(cat /tmp/volume 2>/dev/null)
+    [ -n "$vol" ] || vol=-9
+
     echo "set_ao_mute 0" >/proc/mi_modules/mi_ao/mi_ao0
-    echo "set_ao_volume 0 -9dB" >/proc/mi_modules/mi_ao/mi_ao0
-    echo "set_ao_volume 1 -9dB" >/proc/mi_modules/mi_ao/mi_ao0
+    echo "set_ao_volume 0 ${vol}dB" >/proc/mi_modules/mi_ao/mi_ao0
+    echo "set_ao_volume 1 ${vol}dB" >/proc/mi_modules/mi_ao/mi_ao0
 
 }
 
