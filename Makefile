@@ -4,15 +4,10 @@ DIST_DIR := dist
 RETROARCH := third-party/RetroArch-patch
 TOOLCHAIN := mholdg16/miyoomini-toolchain:latest
 
-CROSS_TARGET_TRIPLE := armv7-unknown-linux-gnueabihf
+TARGET_TRIPLE := armv7-unknown-linux-gnueabihf
+GLIBC_VERSION := 2.28
 
 -include local.mk
-
-PLATFORM := $(shell uname -m)
-ifeq ($(PLATFORM),arm64)
-  export CROSS_TARGET_ARM_UNKNOWN_LINUX_GNUEABIHF_IMAGE_TOOLCHAIN = aarch64-unknown-linux-gnu
-  export CROSS_TARGET_ARM_UNKNOWN_LINUX_GNUEABIHF_IMAGE = goweiwen/cross-with-clang_armv7-unknown-linux-gnueabihf:aarch64
-endif
 
 .PHONY: all
 all: dist build package-build $(DIST_DIR)/RetroArch/retroarch $(DIST_DIR)/.allium/bin/dufs $(DIST_DIR)/.allium/bin/syncthing $(DIST_DIR)/.allium/cores/drastic/drastic migrations
@@ -45,11 +40,15 @@ third-party/my283:
 
 .PHONY: build
 build: third-party/my283
-	cross build --release --target=$(CROSS_TARGET_TRIPLE) --features=miyoo --bin=alliumd --bin=allium-launcher --bin=allium-menu --bin=activity-tracker --bin=screenshot --bin=say --bin=show --bin=show-hotkeys --bin=myctl
+	cargo zigbuild --release --target=$(TARGET_TRIPLE).$(GLIBC_VERSION) --features=miyoo --bin=alliumd --bin=allium-launcher --bin=allium-menu --bin=activity-tracker --bin=screenshot --bin=say --bin=show --bin=show-hotkeys --bin=myctl
+	patchelf \
+		--replace-needed third-party/my283/usr/lib/libcam_os_wrapper.so libcam_os_wrapper.so \
+		--replace-needed third-party/my283/usr/lib/libmi_sys.so libmi_sys.so \
+		target/$(TARGET_TRIPLE)/release/myctl
 
 .PHONY: debug
 debug: third-party/my283
-	cross build --target=$(CROSS_TARGET_TRIPLE) --features=miyoo --bin=alliumd --bin=allium-launcher --bin=allium-menu --bin=activity-tracker --bin=screenshot --bin=say --bin=show --bin=show-hotkeys --bin=myctl
+	cargo zigbuild --target=$(TARGET_TRIPLE).$(GLIBC_VERSION) --features=miyoo --bin=alliumd --bin=allium-launcher --bin=allium-menu --bin=activity-tracker --bin=screenshot --bin=say --bin=show --bin=show-hotkeys --bin=myctl
 
 .PHONY: package-build
 package-build:
@@ -84,8 +83,8 @@ $(RETROARCH)/bin/retroarch_miyoo354:
 	docker run --rm -v /$(ROOT_DIR)/$(RETROARCH):/root/workspace $(TOOLCHAIN) bash -c "source /root/.bashrc; make all"
 
 $(DIST_DIR)/.allium/bin/dufs:
-	cd third-party/dufs && cross build --release --target=$(CROSS_TARGET_TRIPLE)
-	cp "third-party/dufs/target/$(CROSS_TARGET_TRIPLE)/release/dufs" "$(DIST_DIR)/.allium/bin/"
+	cd third-party/dufs && cargo zigbuild --release --target=$(TARGET_TRIPLE).$(GLIBC_VERSION)
+	cp "third-party/dufs/target/$(TARGET_TRIPLE)/release/dufs" "$(DIST_DIR)/.allium/bin/"
 
 SYNCTHING_VERSION := "v2.0.10"
 SYNCTHING_URL := "https://github.com/syncthing/syncthing/releases/download/$(SYNCTHING_VERSION)/syncthing-linux-arm-$(SYNCTHING_VERSION).tar.gz"

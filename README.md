@@ -97,7 +97,7 @@ Allium supports both the Miyoo Mini, Miyoo Mini Plus,and Miyoo Mini Flip on the 
 Allium comes with a simulator that can be used for development. The simulator requires SDL2 to be installed.
 
 ### Requirements
-1. `make`, `cargo`, `zip`, `clang` (`libclang-dev`)
+1. `make`, `cargo`, `zip`, `clang` (`libclang-dev`), patchelf
 2. [SDL2](https://github.com/Rust-SDL2/rust-sdl2#sdl20-development-libraries) (optional, if simulator is not used)
 3. [cross](https://github.com/cross-rs/cross): `cargo install cross --git https://github.com/cross-rs/cross` (optional, for cross-compilation)
 

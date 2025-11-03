@@ -35,11 +35,12 @@ source "$HOME/.cargo/env"
 rustup target add armv7-unknown-linux-gnueabihf
 
 echo "---------------------------------------"
-echo "Installing cross for cross-compilation..."
+echo "Installing Zig, patchelf and cargo-zigbuild..."
 echo "---------------------------------------"
 echo ""
 
-cargo install cross --git https://github.com/cross-rs/cross
+brew install zig patchelf
+cargo install cargo-zigbuild
 
 echo "---------------------------------------"
 echo "Initializing git submodules..."
