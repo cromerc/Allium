@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::path::Path;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -172,9 +173,13 @@ impl RecentsCarousel {
             return Ok(());
         }
 
-        let game = &self.games[self.selected];
+        let game = &mut self.games[self.selected];
 
-        self.screenshot.set_path(game.screenshot_path.clone());
+        self.screenshot.set_path(
+            game.screenshot_path
+                .clone()
+                .or_else(|| game.image.image().map(Path::to_owned)),
+        );
         self.screenshot.set_should_draw();
         self.game_name.set_text(game.name.clone());
         self.button_hints.set_should_draw();
