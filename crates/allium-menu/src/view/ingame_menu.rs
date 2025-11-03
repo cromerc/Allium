@@ -101,7 +101,7 @@ where
             8,
         );
 
-        let entries = MenuEntry::entries(&retroarch_info);
+        let entries = MenuEntry::entries(retroarch_info.as_ref());
         let mut menu = SettingsList::new(
             Rect::new(
                 x + 12,
@@ -123,7 +123,7 @@ where
             let mut map = HashMap::new();
             map.insert("disk".into(), (info.disk_slot + 1).into());
             menu.set_right(
-                MenuEntry::Continue as usize,
+                MenuEntry::Continue.index(retroarch_info.as_ref()),
                 Box::new(Label::new(
                     Point::zero(),
                     locale.ta("ingame-menu-disk", &map),
@@ -174,7 +174,7 @@ where
         if state.is_text_reader_open
             && let Some(guide) = game_info.guide.as_ref()
         {
-            menu.select(MenuEntry::Guide as usize);
+            menu.select(MenuEntry::Guide.index(retroarch_info.as_ref()));
             child = Some(TextReader::new(rect, res.clone(), guide.clone()));
         }
 
@@ -432,8 +432,8 @@ where
         let selected = self.menu.selected();
 
         // Handle disk slot selection
-        if let Some(info) = self.retroarch_info.as_mut() {
-            if info.max_disk_slots > 1 && selected == MenuEntry::Continue as usize {
+        if let Some(ref mut info) = self.retroarch_info {
+            if info.max_disk_slots > 1 && selected == MenuEntry::Continue.index(Some(info)) {
                 match event {
                     KeyEvent::Pressed(Key::Left) | KeyEvent::Autorepeat(Key::Left) => {
                         info.disk_slot = info.disk_slot.saturating_sub(1);
@@ -474,8 +474,9 @@ where
             }
 
             // Handle state slot selection
-            if let Some(state_slot) = info.state_slot.as_mut()
-                && (selected == MenuEntry::Save as usize || selected == MenuEntry::Load as usize)
+            if (selected == MenuEntry::Save.index(Some(info))
+                || selected == MenuEntry::Load.index(Some(info)))
+                && let Some(state_slot) = info.state_slot.as_mut()
             {
                 match event {
                     KeyEvent::Pressed(Key::Left) | KeyEvent::Autorepeat(Key::Left) => {
@@ -600,7 +601,7 @@ impl MenuEntry {
         }
     }
 
-    fn entries(info: &Option<RetroArchInfo>) -> Vec<Self> {
+    fn entries(info: Option<&RetroArchInfo>) -> Vec<Self> {
         match info {
             Some(RetroArchInfo {
                 state_slot: Some(_),
@@ -623,5 +624,10 @@ impl MenuEntry {
             ],
             None => vec![MenuEntry::Continue, MenuEntry::Guide, MenuEntry::Quit],
         }
+    }
+
+    fn index(&self, info: Option<&RetroArchInfo>) -> usize {
+        let entries = MenuEntry::entries(info);
+        entries.iter().position(|e| e == self).unwrap_or(0)
     }
 }
