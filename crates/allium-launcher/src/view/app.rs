@@ -254,6 +254,7 @@ where
 
     pub fn start_search(&mut self) {
         self.search_view.activate();
+        self.status_bar.set_should_draw();
     }
 
     pub fn search(&mut self, query: String) -> Result<()> {
@@ -309,7 +310,10 @@ where
         drawn |= self.search_view.draw(display, styles)?;
 
         if let Some(search_results) = &mut self.search_results {
-            drawn |= search_results.draw(display, styles)?;
+            drawn |= search_results.should_draw()
+                && search_results.draw(display, styles)?
+                && self.status_bar.draw(display, styles)?;
+            drawn |= self.status_bar.should_draw() && self.status_bar.draw(display, styles)?;
         }
 
         Ok(drawn)

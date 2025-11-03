@@ -157,7 +157,9 @@ where
 
                 let mut truncated = false;
                 if text.bounding_box().size.width > width {
-                    while text.bounding_box().size.width + ellipsis_width > width {
+                    while text.bounding_box().size.width + ellipsis_width > width
+                        && !text.text.is_empty()
+                    {
                         let mut n = text.text.len() - 1;
                         while !text.text.is_char_boundary(n) {
                             n -= 1;
@@ -236,14 +238,17 @@ where
             self.layout(styles);
         }
 
-        let text = Text::with_alignment(
-            self.truncated_text.as_ref().unwrap(),
-            self.point.into(),
-            text_style,
-            self.alignment.into(),
-        );
+        let truncated_text = self.truncated_text.as_ref().unwrap();
+        if !truncated_text.is_empty() {
+            let text = Text::with_alignment(
+                truncated_text,
+                self.point.into(),
+                text_style,
+                self.alignment.into(),
+            );
 
-        text.draw(display)?;
+            text.draw(display)?;
+        }
 
         self.dirty = false;
         Ok(true)

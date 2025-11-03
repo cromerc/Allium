@@ -155,7 +155,6 @@ impl SearchResultsView {
         };
 
         let sort = SearchResultsSort::Relevance(query.clone());
-        let list = EntryList::new(Rect::new(x, y + 72, w, h - 72), res.clone(), sort.clone())?;
 
         let result_text = {
             let locale = res.get::<Locale>();
@@ -167,19 +166,28 @@ impl SearchResultsView {
             locale.ta("search-games-found", &map)
         };
 
-        let header = Label::new(
+        let mut header = Label::new(
             Point::new(x + 12, y + 8),
             format!("Search: {}", query),
             Alignment::Left,
             Some(w - 24),
         );
+        header.font_size(styles.tab_font_size);
 
-        let result_count = Label::new(
-            Point::new(x + 12, y + 36),
+        let mut result_count = Label::new(
+            Point::new(x + 12, y + 8 + styles.tab_font_size() as i32),
             result_text,
             Alignment::Left,
             Some(w - 24),
         );
+        result_count.font_size(styles.tab_font_size);
+
+        let list_y = y + 8 + styles.tab_font_size() as i32 * 2;
+        let list = EntryList::new(
+            Rect::new(x, y + list_y, w, h - list_y as u32),
+            res.clone(),
+            sort.clone(),
+        )?;
 
         let button_hints = Row::new(
             Point::new(

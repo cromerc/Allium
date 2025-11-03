@@ -229,6 +229,13 @@ impl DrawTarget for SimulatorWindow {
         let pixels: Vec<_> = pixels
             .into_iter()
             .map(|p| {
+                if p.0.x < 0
+                    || p.0.y < 0
+                    || p.0.x > SCREEN_WIDTH as i32
+                    || p.0.y > SCREEN_HEIGHT as i32
+                {
+                    panic!("Pixel out of bounds: {:?}", p);
+                }
                 let curr = self.display.get_pixel(p.0);
                 let color = p.1;
 
