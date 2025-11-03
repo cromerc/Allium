@@ -159,18 +159,12 @@ impl SearchResultsView {
 
         let result_text = {
             let locale = res.get::<Locale>();
-            if entry_count == 0 {
-                locale.t("no-search-results")
-            } else if entry_count == 1 {
-                locale.t("one-search-result")
-            } else {
-                let mut map = HashMap::new();
-                map.insert(
-                    "count".into(),
-                    LocaleFluentValue::from(entry_count.to_string()),
-                );
-                locale.ta("n-search-results", &map)
-            }
+            let mut map = HashMap::new();
+            map.insert(
+                "count".into(),
+                LocaleFluentValue::from(entry_count.to_string()),
+            );
+            locale.ta("search-games-found", &map)
         };
 
         let header = Label::new(

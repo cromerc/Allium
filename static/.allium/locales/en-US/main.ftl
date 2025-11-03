@@ -15,9 +15,12 @@ sort-favorites = Sort: Favorites
 sort-relevance = Sort: Relevance
 
 no-recent-games = Play a game to get started
-no-search-results = No games found
-one-search-result = 1 game found
-n-search-results = { $count } games found
+search-games-found = 
+    { $count -> 
+        [zero] No games found
+        [one] 1 game found
+       *[other] { $count } games found
+    }
 
 populating-database = Populating database...
     This may take several minutes.
