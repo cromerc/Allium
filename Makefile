@@ -81,7 +81,7 @@ $(DIST_DIR)/RetroArch/retroarch: $(RETROARCH)/bin/retroarch_miyoo354
 	cp "$(RETROARCH)/bin/retroarch_miyoo354" "$(DIST_DIR)/RetroArch/retroarch"
 
 $(RETROARCH)/bin/retroarch_miyoo354:
-	docker run --rm -v /$(ROOT_DIR)/$(RETROARCH):/root/workspace $(TOOLCHAIN) bash -c "source /root/.bashrc; make clean all"
+	docker run --rm -v /$(ROOT_DIR)/$(RETROARCH):/root/workspace $(TOOLCHAIN) bash -c "source /root/.bashrc; make all"
 
 $(DIST_DIR)/.allium/bin/dufs:
 	cd third-party/dufs && cross build --release --target=$(CROSS_TARGET_TRIPLE)
