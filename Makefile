@@ -15,7 +15,7 @@ ifeq ($(PLATFORM),arm64)
 endif
 
 .PHONY: all
-all: dist build package-build $(DIST_DIR)/RetroArch/retroarch $(DIST_DIR)/.allium/bin/dufs $(DIST_DIR)/.allium/bin/syncthing $(DIST_DIR)/.allium/cores/drastic/launch.sh migrations
+all: dist build package-build $(DIST_DIR)/RetroArch/retroarch $(DIST_DIR)/.allium/bin/dufs $(DIST_DIR)/.allium/bin/syncthing $(DIST_DIR)/.allium/cores/drastic/drastic migrations
 
 .PHONY: clean
 clean:
@@ -97,10 +97,10 @@ $(DIST_DIR)/.allium/bin/syncthing:
 		strip --strip-all "$(DIST_DIR)/.allium/bin/syncthing" || true
 
 DRASTIC_URL := https://github.com/steward-fu/nds/releases/download/v1.8/drastic-v1.8_miyoo.zip
-$(DIST_DIR)/.allium/cores/drastic/launch.sh:
+$(DIST_DIR)/.allium/cores/drastic/drastic:
 	wget "$(DRASTIC_URL)" -O /tmp/drastic.zip
-	mkdir -p $(DIST_DIR)/.allium/cores/drastic/drastic
-	unzip -o /tmp/drastic.zip -d $(DIST_DIR)/.allium/cores/drastic/drastic
+	mkdir -p $(DIST_DIR)/.allium/cores/drastic
+	unzip -o /tmp/drastic.zip -d $(DIST_DIR)/.allium/cores/drastic
 	rm /tmp/drastic.zip
 
 .PHONY: lint
