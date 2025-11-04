@@ -55,7 +55,12 @@ impl Entry {
         }
 
         // Exclude DB
-        const EXCLUDE_EXTENSIONS: [&str; 3] = ["db", "sbi", "nfo"];
+        const EXCLUDE_EXTENSIONS: [&str; 5] = [
+            "db", "sbi", // PSX
+            "nfo", // PICO-8
+            "msu", // MSU-1
+            "pcm", // MSU-1
+        ];
         if EXCLUDE_EXTENSIONS.contains(&extension.as_str()) {
             return Ok(None);
         }
