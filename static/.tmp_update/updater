@@ -74,9 +74,17 @@ done
 show -c
 
 # run Allium
-RUST_LOG=none "$ROOT"/.allium/bin/alliumd >/dev/null 2>&1
+RUST_LOG=info "$ROOT"/.allium/bin/alliumd >"$ROOT"/allium.log 2>&1
 
-while true; do
-    reboot
-    sleep 10
-done
+if [ -f "$ROOT"/.debug ]; then
+    "$ROOT"/.allium/scripts/wifi-on.sh
+    "$ROOT"/.allium/scripts/telnet-on.sh
+    while true; do
+        sleep 10
+    done
+else
+    while true; do
+        reboot
+        sleep 10
+    done
+fi
