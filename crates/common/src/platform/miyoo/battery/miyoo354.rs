@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::Duration;
 use wait_timeout::ChildExt;
@@ -57,5 +60,13 @@ impl Battery for Miyoo354Battery {
 
     fn charging(&self) -> bool {
         self.charging
+    }
+
+    fn update_led(&mut self, enabled: bool) {
+        if !Path::new("/sys/class/gpio/gpio86").exists() {
+            let _ = File::create("/sys/class/gpio/export").and_then(|mut f| f.write_all(b"86"));
+        }
+        let _ = File::create("/sys/class/gpio/gpio86/value")
+            .and_then(|mut f| f.write_all(if enabled { b"1" } else { b"0" }));
     }
 }

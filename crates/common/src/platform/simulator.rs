@@ -14,7 +14,7 @@ use embedded_graphics_simulator::{
 use image::buffer::ConvertBuffer;
 use image::{ImageBuffer, Rgba};
 use itertools::iproduct;
-use log::{trace, warn};
+use log::{info, trace, warn};
 use sdl2::keyboard::Keycode;
 
 use crate::battery::Battery;
@@ -321,5 +321,12 @@ impl Battery for SimulatorBattery {
 
     fn charging(&self) -> bool {
         self.charging
+    }
+
+    fn update_led(&mut self, enabled: bool) {
+        info!(
+            "[Simulator] Charging LED: {}",
+            if enabled { "ON" } else { "OFF" }
+        );
     }
 }

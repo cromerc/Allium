@@ -50,6 +50,8 @@ pub struct AlliumD<P: Platform> {
     state: AlliumDState,
     locale: Locale,
     power_settings: PowerSettings,
+    led_enabled: bool,
+    last_led_toggle: Instant,
 }
 
 impl AlliumDState {
@@ -153,6 +155,8 @@ impl AlliumD<DefaultPlatform> {
             state,
             locale,
             power_settings,
+            led_enabled: false,
+            last_led_toggle: Instant::now(),
         })
     }
 
@@ -194,6 +198,7 @@ impl AlliumD<DefaultPlatform> {
                     if let Err(e) = battery.update() {
                         error!("failed to update battery: {}", e);
                     }
+                    self.update_charging_led(&mut battery);
                     if battery.percentage() <= BATTERY_SHUTDOWN_THRESHOLD && !battery.charging() {
                         warn!("battery is low, shutting down");
                         self.handle_quit().await?;
@@ -545,6 +550,30 @@ impl AlliumD<DefaultPlatform> {
         self.state.brightness = (self.state.brightness as i8 + add).clamp(0, 100) as u8;
         self.platform.set_brightness(self.state.brightness)?;
         Ok(())
+    }
+
+    fn update_charging_led(&mut self, battery: &mut <DefaultPlatform as Platform>::Battery) {
+        if battery.percentage() >= 100 {
+            if self.led_enabled {
+                self.led_enabled = false;
+                battery.update_led(self.led_enabled);
+            }
+            return;
+        }
+
+        // Calculate blink frequency: 0.5Hz at 20% -> 2Hz at 0%
+        const LOW_BATTERY_PERCENTAGE: i32 = 100;
+        let freq = 0.5
+            + (LOW_BATTERY_PERCENTAGE - battery.percentage()) as f32
+                / LOW_BATTERY_PERCENTAGE as f32
+                * 1.5;
+        let period = std::time::Duration::from_secs_f32(1.0 / freq);
+
+        if self.last_led_toggle.elapsed() >= period {
+            self.led_enabled = !self.led_enabled;
+            self.last_led_toggle = Instant::now();
+            battery.update_led(self.led_enabled);
+        }
     }
 }
 

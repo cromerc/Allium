@@ -86,6 +86,10 @@ impl Battery for Miyoo283Battery {
             }
         }
     }
+
+    fn update_led(&mut self, _enabled: bool) {
+        // no addressable charging LED
+    }
 }
 
 #[inline]
