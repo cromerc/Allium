@@ -149,7 +149,9 @@ where
     pub fn load_or_new(rect: Rect, res: Resources, battery: B) -> Result<Self> {
         let tab_rect = {
             let styles = res.get::<Stylesheet>();
-            let font_size = (styles.ui_font.size as f32 * styles.tab_font_size) as u32;
+            let font_size = (styles.ui_font.size as f32
+                * styles.tab_font_size.max(styles.status_bar_font_size))
+                as u32;
             Rect::new(
                 rect.x,
                 rect.y + font_size as i32 + 8,
