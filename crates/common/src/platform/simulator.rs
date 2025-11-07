@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::process;
 use std::rc::Rc;
+use std::sync::LazyLock;
 use std::time::Duration;
 
 use anyhow::{Result, bail};
@@ -24,8 +25,19 @@ use crate::display::settings::DisplaySettings;
 use crate::geom::Rect;
 use crate::platform::{Key, KeyEvent, Platform};
 
-pub const SCREEN_WIDTH: u32 = 640;
-pub const SCREEN_HEIGHT: u32 = 480;
+static SCREEN_WIDTH: LazyLock<u32> = LazyLock::new(|| {
+    std::env::var("WIDTH")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(752)
+});
+
+static SCREEN_HEIGHT: LazyLock<u32> = LazyLock::new(|| {
+    std::env::var("HEIGHT")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(560)
+});
 
 pub struct SimulatorPlatform {
     window: Rc<RefCell<Window>>,
@@ -77,9 +89,10 @@ impl Platform for SimulatorPlatform {
     }
 
     fn display(&mut self) -> Result<SimulatorWindow> {
-        let display = SimulatorDisplay::load_png("simulator/bg-640x480.png").unwrap_or_else(|_| {
+        let bg_path = format!("simulator/bg-{}x{}.png", *SCREEN_WIDTH, *SCREEN_HEIGHT);
+        let display = SimulatorDisplay::load_png(&bg_path).unwrap_or_else(|_| {
             SimulatorDisplay::with_default_color(
-                Size::new(SCREEN_WIDTH, SCREEN_HEIGHT),
+                Size::new(*SCREEN_WIDTH, *SCREEN_HEIGHT),
                 Color::new(0, 0, 0),
             )
         });
@@ -231,8 +244,8 @@ impl DrawTarget for SimulatorWindow {
             .map(|p| {
                 if p.0.x < 0
                     || p.0.y < 0
-                    || p.0.x > SCREEN_WIDTH as i32
-                    || p.0.y > SCREEN_HEIGHT as i32
+                    || p.0.x > *SCREEN_WIDTH as i32
+                    || p.0.y > *SCREEN_HEIGHT as i32
                 {
                     panic!("Pixel out of bounds: {:?}", p);
                 }
