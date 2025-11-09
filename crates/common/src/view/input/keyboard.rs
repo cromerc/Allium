@@ -22,6 +22,7 @@ use crate::view::{ButtonHint, ButtonIcon, Row, View};
 
 #[derive(Debug, Clone)]
 pub struct Keyboard {
+    res: Resources,
     value: String,
     cursor: rusttype::Point<usize>,
     mode: KeyboardMode,
@@ -69,7 +70,11 @@ impl Keyboard {
             12,
         );
 
+        drop(locale);
+        drop(styles);
+
         Self {
+            res,
             value,
             cursor: rusttype::Point { x: 5, y: 2 },
             mode: KeyboardMode::Lowercase,
@@ -93,6 +98,7 @@ impl View for Keyboard {
     ) -> Result<bool> {
         let mut drawn = false;
         if self.dirty {
+            display.load(self.bounding_box(styles))?;
             let text_style = FontTextStyleBuilder::new(styles.ui_font.font())
                 .font_fallback(styles.cjk_font.font())
                 .font_size(styles.ui_font.size)
@@ -314,16 +320,20 @@ impl View for Keyboard {
         vec![]
     }
 
-    fn bounding_box(&mut self, _styles: &Stylesheet) -> Rect {
-        let key_size = 32_u32;
-        let key_padding = 4;
+    fn bounding_box(&mut self, styles: &Stylesheet) -> Rect {
+        let size = self.res.get::<geom::Size>();
 
-        let w = key_size * KEYBOARD_COLUMNS as u32 + key_padding * 14;
-        let h = key_size * KEYBOARD_ROWS as u32 + key_padding * 5;
-        let x = (640 - w as i32) / 2;
-        let y = 480_i32 - h as i32;
+        let key_size = styles.ui_font.size;
+        let key_padding = 0;
+        let h = key_size as i32 * KEYBOARD_ROWS + key_padding * 5 + 8;
+        let y = size.h as i32 - h - ButtonIcon::diameter(styles) as i32 - 8 - 8;
 
-        Rect::new(x, y, w, h)
+        Rect::new(
+            8,
+            y - styles.ui_font.size as i32 - 8,
+            size.w - 16,
+            h as u32 + styles.ui_font.size + 8,
+        )
     }
 
     fn set_position(&mut self, _point: crate::geom::Point) {}
