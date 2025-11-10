@@ -6,6 +6,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use common::command::Command;
 use common::database::Database;
+use common::display::Display;
 use common::display::font::FontTextStyleBuilder;
 use common::geom::{Alignment, Point, Rect};
 use common::locale::Locale;
@@ -358,6 +359,7 @@ impl View for TextReader {
         let mut drawn = false;
 
         if self.dirty {
+            display.load(display.bounding_box().into())?;
             RoundedRectangle::with_equal_corners(
                 <Rect as Into<Rectangle>>::into(Rect::new(
                     self.rect.x + 12,
