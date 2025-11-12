@@ -152,3 +152,7 @@ endif
 	@echo "Deploying full dist to $(SDCARD_PATH)..."
 	rsync --progress --modify-window=1 --update --recursive --times --verbose --delete $(DIST_DIR)/.allium $(DIST_DIR)/.tmp_update $(DIST_DIR)/Apps $(DIST_DIR)/RetroArch $(SDCARD_PATH)/
 	@echo "Full deployment complete! Remember to eject your SD card properly."
+
+.PHONY: toolchain
+toolchain:
+	docker run --rm -it -v $(ROOT_DIR):/root/workspace $(TOOLCHAIN) bash
